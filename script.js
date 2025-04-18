@@ -1,28 +1,30 @@
-document.getElementById('student-form').addEventListener('submit', function (e) {
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("enrollment-form");
+  const successMessage = document.getElementById("success-message");
+
+  form.addEventListener("submit", function (e) {
     e.preventDefault();
-    const form = e.target;
-    const data = new FormData(form);
+    successMessage.classList.add("hidden");
+
+    const formData = new FormData(form);
     const object = {};
-    data.forEach((value, key) => {
-      const match = key.match(/^data\\[(.*)\\]$/);
-      if (match) object[match[1]] = value;
-    });
-  
-    fetch(form.action, {
+    formData.forEach((value, key) => object[key] = value);
+
+    fetch("https://sheetdb.io/api/v1/fojmtigc5mq3s", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ data: object })
     })
-    .then(response => response.json())
-    .then(() => {
-      document.getElementById('response-message').textContent = "Form submitted successfully!";
-      form.reset();
-    })
-    .catch(error => {
-      document.getElementById('response-message').textContent = "An error occurred.";
-      console.error('Error:', error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        form.reset();
+        successMessage.classList.remove("hidden");
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("Something went wrong. Please try again later.");
+      });
   });
-  
+});
